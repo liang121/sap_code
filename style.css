@@ -1,0 +1,71 @@
+body {
+	font-family: "TheinhardtRegular", Arial, Helvetica, sans-serif;
+}
+#events-container {
+	width:600px;
+	height: 720px;
+	padding: 0 10px;
+	float: left;
+	background: rgb(231, 231, 231);
+	/*border:1px solid red;*/
+}
+#left-side-time-slot {
+	width:100px;
+	height:720px;
+	margin: 0 auto;
+	float:left;
+	padding-right:2px;
+	/*border:1px solid blue;*/
+}
+#left-side-time-slot > div {
+	text-align: right;
+	width:100%;
+	color: rgb(98, 98, 98);
+	height:720px;
+	margin-top:-3px;
+}
+#left-side-time-slot > div div:last-child {
+	margin-top:-7px;
+}
+#left-side-time-slot .odd {
+	font-size:13px;
+	height:30px;
+}
+#left-side-time-slot .even {
+	font-size:10px;
+	height:30px;
+	color:rgb(151, 151, 151)
+}
+#container {
+	width:800px;
+	margin:0px auto;
+	height:720px;
+	padding:50px 0px;
+}
+.am {
+	font-size:10px;
+	color:rgb(151, 151, 151)
+}
+.event {
+	border: 1px solid rgb(209, 209, 209); 
+	border-left: 3px solid rgb(57, 163, 115);
+	background-color:white;
+	/*float:left;*/
+	position:absolute;;
+	width:100%;
+}
+.event .title {
+	color: rgb(57, 163, 115); 
+	font-size:13px; 
+	font-weight:bold
+}
+.event .event-content {
+	font-size:11px; 
+	color:rgb(151, 151, 151)
+}
+#events-container {
+	/*position:absolute;*/
+}
+
+
+

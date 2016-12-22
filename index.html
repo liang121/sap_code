@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+	<div id="container">
+		<div id="left-side-time-slot" style=""></div>
+		<div id="events-container">
+			<table style="width:100%;">
+				<tbody>
+					<tr id="test">
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	<div>
+	<script src="./timeSlot.module.js"></script>
+	<script type="text/javascript">
+
+		
+		var eventsQueue = [];
+		var colNum = 0;
+		var colArr = [];
+		var tdArray = [];
+		var divArray = [];
+		function layoutDay (arr) {
+			for (var i=0; i<arr.length; i++) {
+				renderDay(arr[i]);
+			}
+			for (var i=0; i<divArray.length; i++) {
+				for (var j=0; j<divArray[i].length; j++) {
+					var div = divArray[i][j];
+					var divider = colArr[i][j].num;
+					if (divider < colArr.length && i!==0) {
+						div.style.marginLeft = ((600-divider*(1+3))/divider - 600/colArr.length) * i + 'px'
+					}
+					div.style.width = (600-divider*(1+3))/divider + 'px';
+				}
+			}
+		}
+
+		function isOverlap(item1, item2) {
+			return (item1.start <= item2.end && item2.end <= item1.end) || (item2.end >= item1.end && item1.end >= item2.start)
+		}
+		function createEventTitleElement() {
+			var title = document.createElement('div');
+			title.className = 'title';
+			var titleText = document.createTextNode('Sample Title');
+			title.appendChild(titleText);
+			return title;
+		}
+		function createEventContentElement(item) {
+			var content = document.createElement('div');
+			content.className = 'event-content';
+			var startHour = parseInt((item.start+9*60)/60);
+			var startMin = (item.start+9*60)%60 === 0 ? '00' : (item.start+9*60)%60 + '';
+			var endHour = parseInt((item.end+9*60)/60);
+			var endMin = (item.end+9*60)%60 === 0 ? '00' : (item.end+9*60)%60 + '';
+			var contentText = document.createTextNode('Sample Task from '+ startHour + ':' + startMin + ' to ' + endHour + ':' + endMin);
+			content.appendChild(contentText);
+			return content;
+		}
+		function pushToCol(event, colNum) {
+			colArr[colNum].push(event);
+			var td = document.getElementById('col_'+colNum);
+			var div = document.createElement('div');
+			div.className = 'event';
+			div.style.height = event.end - event.start + 'px';
+			div.style.top = event.start + 'px';
+			div.style.width = (600-event.widthSplit*(1+3))/event.widthSplit + 'px';
+			var title = createEventTitleElement();
+			var content = createEventContentElement(event);
+			div.appendChild(title);
+			div.appendChild(content);
+			divArray[colNum].push(div);
+			td.appendChild(div);
+			tdArray[colNum] = td;
+			// return td;
+		}
+		function createNewCol(event, colNum) {
+			colArr[colNum] = [];
+			colArr[colNum].push(event);
+			divArray[colNum] = [];
+			var td = document.createElement('td');
+			td.id = 'col_' + colNum;
+			td.style.position = 'relative';
+			var div = document.createElement('div');
+			div.className = 'event';
+			div.style.height = event.end - event.start + 'px';
+			div.style.top = event.start + 'px'
+			div.style.width = (600-event.widthSplit*(1+3))/event.widthSplit + 'px';
+			var title = createEventTitleElement();
+			var content = createEventContentElement(event);
+			div.appendChild(title);
+			div.appendChild(content);
+			divArray[colNum].push(div);
+			td.appendChild(div);
+			tdArray[colNum] = td;
+			// return td;
+
+		}
+		function renderDay(event) {
+			if (colArr.length === 0) {
+				var td = createNewCol(event, 0);
+			} else {
+				var flag = false;
+				for (var i=0; i<colArr.length; i++) {
+					var col = colArr[i];
+					var flag = false;
+					for (var j=0; j<col.length; j++) {
+						if (isOverlap(col[j], event)) {
+							flag = true;
+							break;
+						}
+					}
+					if (!flag) {
+						pushToCol(event, i);
+						break;
+					}
+				}
+				if (flag && i===colArr.length) {
+					createNewCol(event, i)
+				}
+			}
+			setWidhAndRender();
+			for (var i=0; i<tdArray.length;i++) {
+				var td = tdArray[i];
+				document.getElementById('test').appendChild(td);
+			}
+			
+		}
+
+		var renderTimeSlots = timeSlotModule;
+		document.getElementById('left-side-time-slot').appendChild(renderTimeSlots);
+		
+		function setWidhAndRender() {
+			for (var i=0; i<colArr.length;i++) {
+				var curCol = colArr[i];
+				for (var j=0; j<curCol.length; j++) {
+					var event = curCol[j];
+					var num = 0;
+					for (var p=0; p<colArr.length; p++) {
+						if (p===i) continue;
+						if (hasOverlapWithCol(event, colArr[p])) {
+							num++;
+						}
+					}
+					event.num = num+1;
+				}
+			}
+		}
+		function hasOverlapWithCol(event, col) {
+			for (var i=0; i<col.length; i++) {
+				if (isOverlap(event, col[i])) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		// layoutDay([
+		// 	{start: 0, end: 50},
+		// 	{start: 90, end: 150},  
+		// 	{start: 100, end: 150},
+		// 	{start: 100, end: 150}, 
+		// 	{start: 540, end: 600}, 
+		// 	{start: 560, end: 600}, 
+		// 	{start: 590, end: 620}, 
+		// 	{start: 600, end: 620}, 
+		// 	{start: 610, end: 670}
+		// 	]);
+		layoutDay([ {start: 30, end: 150}, {start: 540, end: 600}, {start: 560, end: 620}, {start: 610, end: 670} ]);
+
+	</script>
+</body>
+</html>

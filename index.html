@@ -32,7 +32,7 @@
 				renderDay(arr[i]);
 			}
 			setWidth();
-			setMargin();
+			setMarginLeft();
 		}
 
 		function isOverlap(item1, item2) {
@@ -40,19 +40,36 @@
 		}
 		function setWidth() {
 			for (var j=0; j<colArr[0].length; j++) {
-				len = getLinkListLength(colArr[0][j]);
+				var len = getLinkListLength(colArr[0][j]);
 				setNodeWidthValue(colArr[0][j], len);
 			}
+			for (var j=0; j<colArr[0].length; j++) {
+				var max =  getLinkListMaxWidth(colArr[0][j]);
+				var node = colArr[0][j];
+				while(node) {
+					node.widthDividerValue = max;
+					node = node.next;
+				}
+			}
 		}
-		function setMargin() {
+		function setMarginLeft() {
 			for (var i=0; i<divArray.length; i++) {
 				for (var j=0; j<divArray[i].length; j++) {
 					var div = divArray[i][j];
 					var event = colArr[i][j];
-					div.style.width = (600-event.widthValue*(1+3))/event.widthValue + 'px';
-					div.style.marginLeft = ((600-event.widthValue*(1+3))/event.widthValue - 600/colArr.length + 4) * i + 'px'
+					div.style.width = (600-event.widthDividerValue*(1+3))/event.widthDividerValue + 'px';
+					div.style.marginLeft = ((600-event.widthDividerValue*(1+3))/event.widthDividerValue - 600/colArr.length + 4) * i + 'px'
 				}
 			}
+		}
+		function getLinkListMaxWidth(node) {
+			if (!node) return 0;
+			if (!node.next) return node.widthDividerValue;
+			var len = 0;
+			for (var i=0; i<node.next.length; i++) {
+				len = Math.max(len, getLinkListMaxWidth(node.next[i]));
+			}
+			return len;
 		}
 		function getLinkListLength(node) {
 			if (!node) return 0;
@@ -66,11 +83,11 @@
 		function setNodeWidthValue(node, len) {
 			if (!node) return;
 			// while(node) {
-			if (!node.widthValue) {
-				node.widthValue = len;
+			if (!node.widthDividerValue) {
+				node.widthDividerValue = len;
 			} else {
-				len = Math.max(node.widthValue,len);
-				node.widthValue = len;
+				len = Math.max(node.widthDividerValue,len);
+				node.widthDividerValue = len;
 			}
 			if (!node.next) return;
 			for (var i=0; i<node.next.length; i++) {
@@ -185,7 +202,6 @@
 		}
 		// layoutDay([
 		// 	{start: 0, end: 50},
-		// 	{start:0, end:60},
 		// 	{start: 90, end: 150},  
 		// 	{start: 10, end: 150},
 		// 	{start: 100, end: 150}, 
